@@ -13,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $dom = new DOMDocument('1.0', 'UTF-8');
     $dom->preserveWhiteSpace = false;
     $dom->formatOutput = true;
-
     if (file_exists($xml_file)) {
         $dom->load($xml_file);
     } else {
@@ -27,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $segnalato = $segnalazione->getElementsByTagName('username_segnalato')->item(0)->nodeValue ?? '';
         $tipo_senalazione = $segnalazione->getElementsByTagName('tipo')->item(0)->nodeValue ?? '';
         $contenuto_segnalato = $segnalazione->getElementsByTagName('contenuto')->item(0)->nodeValue ?? '';
-
         if ( $segnala === $autore_segnalante && $segnalato === $autore_segnalato && $tipo_senalazione === $tipo && $contenuto_segnalato === $contenuto) {
             $duplicato = true;
             break;
