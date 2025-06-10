@@ -4,13 +4,12 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     
-    
     $username = $_SESSION['username']; 
-    $id_recensione = $data['id_risposta']; 
+    $id_recensione = $data['id_recensione']; // Cambiato da 'id_risposta' a 'id_recensione'
     $stelle = $data['stelle']; 
 
-    // caricamento file XML
-    $xmlFile = '../xml/valuta_recensioni.xml';
+    // caricamento file XML delle recensioni
+    $xmlFile = '../xml/recensioni.xml';
     $dom = new DOMDocument('1.0', 'UTF-8');
     $dom->preserveWhiteSpace = false; 
     $dom->formatOutput = true; 
@@ -18,25 +17,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (file_exists($xmlFile)) {
         $dom->load($xmlFile);
     } else {
-        // se il file non esiste, creiamo la struttura di base
-        $root = $dom->createElement('valutazioni');
-        $dom->appendChild($root);
+        echo json_encode(['success' => false, 'message' => 'File non trovato']);
+        exit();
     }
 
-    // aggiungiamo la nuova valutazione
-    $valutazione = $dom->createElement('valutazione');
-    $valutazione->appendChild($dom->createElement('username', htmlspecialchars($username))); // Aggiungiamo lo username
-    $valutazione->appendChild($dom->createElement('id_recensione', htmlspecialchars($id_recensione))); // Aggiungiamo l'ID della recensione
-    $valutazione->appendChild($dom->createElement('stelle', htmlspecialchars($stelle))); // Aggiungiamo il numero di stelle
+    // Trova la recensione corrispondente
+    $recensioni = $dom->getElementsByTagName('recensione');
+    $recensioneTrovata = null;
 
-    // aggiungiamo la valutazione al nodo radice
-    $dom->documentElement->appendChild($valutazione);
+    foreach ($recensioni as $recensione) {
+        if ($recensione->getAttribute('id') == $id_recensione) {
+            $recensioneTrovata = $recensione;
+            break;
+        }
+    }
 
-    // salvataggio file XML
-    $dom->save($xmlFile);
+    if ($recensioneTrovata) {
+        // Controlla se l'utente ha già valutato questa recensione
+        $giudiziNode = $recensioneTrovata->getElementsByTagName('giudizi')->item(0);
+        if ($giudiziNode) {
+            foreach ($giudiziNode->getElementsByTagName('giudizio') as $giudizio) {
+                $usernameVotante = $giudizio->getElementsByTagName('username_votante')->item(0)->textContent;
+                $codiceGioco = $recensioneTrovata->getElementsByTagName('codice_gioco')->item(0)->textContent;
 
-    echo json_encode(['success' => true]);
+                // Se l'username votante è uguale e il codice gioco è lo stesso, non salvare la nuova valutazione
+                if ($usernameVotante === $username) {
+                    echo json_encode(['success' => false, 'message' => 'Hai già valutato questa recensione, non puoi farlo di nuovo.']);
+                    exit();
+                }
+            }
+        }
+
+        // Crea i nodi per il giudizio
+        if (!$giudiziNode) {
+            $giudiziNode = $dom->createElement('giudizi');
+            $recensioneTrovata->appendChild($giudiziNode);
+        }
+
+        $giudizioNode = $dom->createElement('giudizio');
+        $giudizioNode->appendChild($dom->createElement('username_votante', htmlspecialchars($username)));
+        $giudizioNode->appendChild($dom->createElement('stelle', htmlspecialchars($stelle)));
+
+        // Aggiungi il giudizio ai giudizi
+        $giudiziNode->appendChild($giudizioNode);
+
+        // Salvataggio file XML
+        $dom->save($xmlFile);
+
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Recensione non trovata']);
+    }
 } else {
-    echo json_encode(['success' => false, 'message' => 'Invalid request']);
+    echo json_encode(['success' => false, 'message' => 'Richiesta non valida']);
 }
 ?>

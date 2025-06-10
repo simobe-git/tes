@@ -29,6 +29,11 @@
   <valutazione>
     <autore>cliente1</autore>
     <id_risposta>1</id_risposta>
-    <stelle>5</stelle>
+    <stelle>3</stelle>
+  </valutazione>
+  <valutazione>
+    <autore>cliente1</autore>
+    <id_risposta>18</id_risposta>
+    <stelle>4</stelle>
   </valutazione>
 </valutazioni>

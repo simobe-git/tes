@@ -92,11 +92,44 @@ foreach ($valutazioniXml->valutazione as $valutazione) {
 }
 
 // funzione per calcolare la media delle valutazioni
-function calcolaMedia($stelle) {
-    if (empty($stelle)) {
-        return 0.0;     // restituiamo 0.0 se non ci sono valutazioni
+function calcolaMedia($id_recensione) {
+    // caricamento del file XML delle recensioni
+    $xmlFile = '../xml/recensioni.xml';
+    $dom = new DOMDocument('1.0', 'UTF-8');
+    $dom->preserveWhiteSpace = false; 
+    $dom->formatOutput = true; 
+
+    if (file_exists($xmlFile)) {
+        $dom->load($xmlFile);
+    } else {
+        return 0.0; // se il file non esiste, restituiamo 0.0
     }
-    return round(array_sum($stelle) / count($stelle), 1); // calcolo media e restituiamo come float
+
+    // troviamo la recensione corrispondente
+    $recensioni = $dom->getElementsByTagName('recensione');
+    $stelleTotali = 0;
+    $numeroGiudizi = 0;
+
+    foreach ($recensioni as $recensione) {
+        if ($recensione->getAttribute('id') == $id_recensione) {
+            $giudiziNode = $recensione->getElementsByTagName('giudizi')->item(0);
+            if ($giudiziNode) {
+                foreach ($giudiziNode->getElementsByTagName('giudizio') as $giudizio) {
+                    $stelle = (int)$giudizio->getElementsByTagName('stelle')->item(0)->textContent;
+                    $stelleTotali += $stelle;
+                    $numeroGiudizi++;
+                }
+            }
+            break; // usciamo dal ciclo una volta trovata la recensione
+        }
+    }
+
+    // calcoiamo e restituiamo la media
+    if ($numeroGiudizi > 0) {
+        return round($stelleTotali / $numeroGiudizi, 1); 
+    } else {
+        return 0.0; // se non ci sono giudizi, restituiamo 0.0
+    }
 }
 
 // caricamento delle discussioni dal file XML
@@ -403,12 +436,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .btn-valuta {
             background-color: #2196F3; 
-            color: white;
-            border: none;
+            color: white; 
+            border: none; 
             padding: 10px 20px; 
-            border-radius: 5px;
-            font-size: 1em;
-            cursor: pointer;
+            border-radius: 5px; 
+            font-size: 1em; 
+            cursor: pointer; 
             transition: background-color 0.3s ease;
         }
 
@@ -577,7 +610,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     } else {
                         foreach ($recensioniXml->recensione as $recensione): 
                             $id_recensione = (int)$recensione['id'];
-                            $media = calcolaMedia($valutazioni[$id_recensione] ?? []);
+                            $media = calcolaMedia($id_recensione);
                     ?>
                         <div class="recensione">
                             <div class="recensione-header">
@@ -778,10 +811,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div id="finestraValutazione" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; border:1px solid #ccc; padding:20px; z-index:1000; width: 25%; height: 20%;">
         <h3>Valuta Risposta</h3>
         <p id="autoreRisposta" style="color: red; margin-top: 1em;"></p>
-        <div class="stelle-valutazione" data-id="" style="display: inline; margin-left: 10px;">
+        <div class="stelle-valutazione" data-id="<?php echo $risposta['id']; ?>" style="display: inline; margin-left: 10px;">
             <span class="star" data-value="1" style="cursor: pointer;">★</span>
             <span class="star" data-value="2" style="cursor: pointer;">★</span>
             <span class="star" data-value="3" style="cursor: pointer;">★</span>
+            <span class="star" data-value="4" style="cursor: pointer;">★</span>
+            <span class="star" data-value="5" style="cursor: pointer;">★</span>
         </div>
         <button style="margin-left: 1em; border-radius: 8px; height: 2em; width: 20%;" onclick="chiudiFinestra()">Chiudi</button>
     </div>  
@@ -867,24 +902,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.querySelectorAll('.stelle-valutazione .star').forEach(star => {
             star.addEventListener('click', function() {
                 const rating = this.getAttribute('data-value');
-                const autore = document.getElementById('autoreRisposta').innerText.split(": ")[1]; // prendiamo il nome dell'autore
-                const id_risposta = this.parentElement.getAttribute('data-id'); 
+                const id_risposta = this.parentElement.getAttribute('data-id');
 
-                // inviamo la valutazione al server
-                fetch('dettaglio_gioco.php', { 
+                console.log("ID Risposta:", id_risposta);
+
+                // Invia la valutazione al server
+                fetch('valuta_risposta.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ autore: autore, stelle: rating, id_risposta: id_risposta })
+                    body: JSON.stringify({ id_risposta: id_risposta, stelle: rating })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert("Risposta valutata correttamente!"); // messaggio di conferma
-                        chiudiFinestra(); // x chiudere la finestra
+                        alert("Risposta valutata con successo!");
                     } else {
-                        alert("Errore nell'invio della valutazione.");
+                        alert("Errore nella valutazione: " + data.message);
                     }
                 })
                 .catch(error => {
@@ -940,8 +975,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    alert("Segnalazione inviata con successo!");
-                    chiudiFinestraSegnalazione();
+                    if(xhr.responseText.trim() === "Hai già segnalato questo messaggio."){
+                        alert("Hai già segnalato questo messaggio.");
+                    }else{
+                        alert("Segnalazione inviata con successo!");
+                        chiudiFinestraSegnalazione();
+                    }
                 }
             };
             xhr.send(

@@ -17,41 +17,123 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['aggiungi_sconto'])) {
     } else {
         $xml = simplexml_load_file($xml_file);
     }
-    $id = time();
-    $sconto = $xml->sconti->addChild('sconto');
-    $sconto->addAttribute('id', $id);
+
     $tipo = $_POST['tipo_sconto'];
-    $sconto->addChild('tipo', $tipo);
+    $scontoEsistente = false;
+
+    // Controllo per sconto per crediti spesi in un determinato periodo
     if ($tipo === 'crediti_spesi_periodo') {
-        $sconto->addChild('periodo_mesi', $_POST['periodo_mesi']);
-        $livelli = $sconto->addChild('livelli');
-        foreach ($_POST['livello'] as $liv) {
-            $livello = $livelli->addChild('livello');
-            $livello->addChild('requisito_crediti', $liv['requisito_crediti']);
-            $livello->addChild('percentuale', $liv['percentuale']);
-            $livello->addChild('descrizione', $liv['descrizione']);
+        $periodo_mesi = $_POST['periodo_mesi'];
+        $livelli = $_POST['livello']; // Assumiamo che i livelli siano un array di input
+
+        foreach ($xml->sconti->sconto as $sconto) {
+            if ((string)$sconto->tipo === 'crediti_spesi_periodo' && (string)$sconto->periodo_mesi === $periodo_mesi) {
+                // Controlla i livelli
+                foreach ($sconto->livelli->livello as $livello) {
+                    foreach ($livelli as $liv) {
+                        if ((string)$livello->requisito_crediti === $liv['requisito_crediti'] && 
+                            (string)$livello->percentuale === $liv['percentuale']) {
+                            $scontoEsistente = true;
+                            break 2; // Esci dai due cicli
+                        }
+                    }
+                }
+            }
         }
-    } elseif ($tipo === 'reputazione') {
-        $sconto->addChild('percentuale', $_POST['percentuale']);
-        $sconto->addChild('requisito_min', $_POST['requisito_min']);
-        $sconto->addChild('requisito_max', $_POST['requisito_max']);
-    } elseif ($tipo === 'anzianita') {
-        $sconto->addChild('percentuale', $_POST['percentuale']);
-        $sconto->addChild('requisito_mesi', $_POST['requisito_mesi']);
-    } elseif ($tipo === 'acquisto_specifico') {
-        $sconto->addChild('percentuale', $_POST['percentuale']);
-        $sconto->addChild('codice_gioco_richiesto', $_POST['codice_gioco_richiesto']);
     }
-    $sconto->addChild('data_inizio', $_POST['data_inizio']);
-    $sconto->addChild('data_fine', $_POST['data_fine']);
-    // Riformatta e salva con DOMDocument
-    $dom = new DOMDocument('1.0', 'UTF-8');
-    $dom->preserveWhiteSpace = false;
-    $dom->formatOutput = true;
-    $dom->loadXML($xml->asXML());
-    $dom->save($xml_file);
-    header('Location: gestione_sconti_admin.php?success=1');
-    exit();
+    // Controllo per sconto per reputazione
+    elseif ($tipo === 'reputazione') {
+        $percentuale = $_POST['percentuale'];
+        $requisito_min = $_POST['requisito_min'];
+        $requisito_max = $_POST['requisito_max'];
+        foreach ($xml->sconti->sconto as $sconto) {
+            if ((string)$sconto->tipo === 'reputazione' && 
+                (string)$sconto->percentuale === $percentuale && 
+                (string)$sconto->requisito_min === $requisito_min && 
+                (string)$sconto->requisito_max === $requisito_max) {
+                $scontoEsistente = true;
+                break;
+            }
+        }
+    }
+    // Controllo per sconto per anzianità
+    elseif ($tipo === 'anzianita') {
+        $percentuale = $_POST['percentuale'];
+        $requisito_mesi = $_POST['requisito_mesi'];
+        foreach ($xml->sconti->sconto as $sconto) {
+            if ((string)$sconto->tipo === 'anzianita' && 
+                (string)$sconto->percentuale === $percentuale && 
+                (string)$sconto->requisito_mesi === $requisito_mesi) {
+                $scontoEsistente = true;
+                break;
+            }
+        }
+    }
+    // Controllo per sconto per acquisto specifico
+    elseif ($tipo === 'acquisto_specifico') {
+        $percentuale = $_POST['percentuale'];
+        $codice_gioco_richiesto = $_POST['codice_gioco_richiesto'];
+        foreach ($xml->sconti->sconto as $sconto) {
+            if ((string)$sconto->tipo === 'acquisto_specifico' && 
+                (string)$sconto->percentuale === $percentuale && 
+                (string)$sconto->codice_gioco_richiesto === $codice_gioco_richiesto) {
+                $scontoEsistente = true;
+                break;
+            }
+        }
+    }
+
+    if ($scontoEsistente) {
+        echo "<script>alert('Sconto già esistente');</script>";
+    } else {
+        // Trova il massimo ID esistente
+        $maxId = 0;
+        foreach ($xml->sconti->sconto as $sconto) {
+            $currentId = (int)$sconto['id'];
+            if ($currentId > $maxId) {
+                $maxId = $currentId;
+            }
+        }
+
+        // Aggiungi il nuovo sconto con ID incrementale
+        $id = $maxId + 1; // Incrementa l'ID
+        $sconto = $xml->sconti->addChild('sconto');
+        $sconto->addAttribute('id', $id);
+        $sconto->addChild('tipo', $tipo);
+        
+        if ($tipo === 'crediti_spesi_periodo') {
+            $sconto->addChild('periodo_mesi', $_POST['periodo_mesi']);
+            $livelli = $sconto->addChild('livelli');
+            foreach ($_POST['livello'] as $liv) {
+                $livello = $livelli->addChild('livello');
+                $livello->addChild('requisito_crediti', $liv['requisito_crediti']);
+                $livello->addChild('percentuale', $liv['percentuale']);
+                $livello->addChild('descrizione', $liv['descrizione']);
+            }
+        } elseif ($tipo === 'reputazione') {
+            $sconto->addChild('percentuale', $_POST['percentuale']);
+            $sconto->addChild('requisito_min', $_POST['requisito_min']);
+            $sconto->addChild('requisito_max', $_POST['requisito_max']);
+        } elseif ($tipo === 'anzianita') {
+            $sconto->addChild('percentuale', $_POST['percentuale']);
+            $sconto->addChild('requisito_mesi', $_POST['requisito_mesi']);
+        } elseif ($tipo === 'acquisto_specifico') {
+            $sconto->addChild('percentuale', $_POST['percentuale']);
+            $sconto->addChild('codice_gioco_richiesto', $_POST['codice_gioco_richiesto']);
+        }
+        
+        $sconto->addChild('data_inizio', $_POST['data_inizio']);
+        $sconto->addChild('data_fine', $_POST['data_fine']);
+        
+        // Riformatta e salva con DOMDocument
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml->asXML());
+        $dom->save($xml_file);
+        header('Location: gestione_sconti_admin.php?success=1');
+        exit();
+    }
 }
 
 // gestione della form per aggiungere bonus
