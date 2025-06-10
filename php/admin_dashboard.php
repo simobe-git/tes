@@ -11,6 +11,9 @@ if (!isset($_SESSION['statoLogin'])) {
     header("Location: home.php");
     exit();
 }
+
+
+echo "";
 ?>
 
 <!DOCTYPE html>
