@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE utenti SYSTEM "../dtd/avatar.dtd">
+<utenti>
+  <utente>
+    <username>admin1</username>
+    <avatar>default_avatar.jpg</avatar>
+  </utente>
+  <utente>
+    <username>gestore1</username>
+    <avatar>default_avatar.jpg</avatar>
+  </utente>
+  <utente>
+    <username>cliente1</username>
+    <avatar>stack.png</avatar>
+  </utente>
+  <utente>
+    <username>cliente2</username>
+    <avatar>default_avatar.jpg</avatar>
+  </utente>
+  <utente>
+    <username>cliente3</username>
+    <avatar>avatar2.jpg</avatar>
+  </utente>
+  <utente>
+    <username>gestore2</username>
+    <avatar>avatar3.jpg</avatar>
+  </utente>
+  <utente>
+    <username>cliente4</username>
+    <avatar>stack.png</avatar>
+  </utente>
+</utenti>

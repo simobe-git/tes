@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE richiesteGestore SYSTEM "../dtd/richieste_gestore.dtd">
+<richiesteGestore>
+  <richiesta>
+    <username>cliente1</username>
+    <data>2025-04-21 15:50:47</data>
+    <status>rifiutata</status>
+  </richiesta>
+  <richiesta>
+    <username>cliente1</username>
+    <data>2025-04-21 15:54:51</data>
+    <status>rifiutata</status>
+  </richiesta>
+</richiesteGestore>

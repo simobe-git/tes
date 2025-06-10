@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE segnalazioni SYSTEM "../dtd/segnalazioni.dtd">
+<segnalazioni>
+  
+<segnalazione>
+    <username_segnalante>cliente2</username_segnalante>
+    <username_segnalato>cliente1</username_segnalato>
+    <motivo>troppo cattivo</motivo>
+    <tipo>domanda</tipo>
+    <contenuto>questa è la domanda per Cluedo. Giusto?</contenuto>
+</segnalazione>
+<segnalazione>
+    <username_segnalante>cliente1</username_segnalante
+        ><username_segnalato>mario123</username_segnalato>
+        <motivo>troppo offensivo</motivo>
+        <tipo>domanda</tipo>
+        <contenuto>Consigliereste di giocare ad un ragazzo di 13 anni?</contenuto>
+    </segnalazione>
+</segnalazioni>
