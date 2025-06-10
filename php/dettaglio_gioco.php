@@ -939,9 +939,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             xhr.open("POST", "invia_segnalazione.php", true);
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.onreadystatechange = function () {
+                
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    alert("Segnalazione inviata con successo!");
-                    chiudiFinestraSegnalazione();
+                    if(xhr.responseText.trim() === "Hai già segnalato questo messaggio."){
+                        alert("Hai già segnalato questo messaggio.");
+                    }else{
+                        alert("Segnalazione inviata con successo!");
+                        chiudiFinestraSegnalazione();
+                    }
                 }
             };
             xhr.send(

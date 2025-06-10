@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE segnalazioni SYSTEM "../dtd/segnalazioni.dtd">
 <segnalazioni>
-  
-<segnalazione>
+  <segnalazione>
     <username_segnalante>cliente2</username_segnalante>
     <username_segnalato>cliente1</username_segnalato>
     <motivo>troppo cattivo</motivo>
     <tipo>domanda</tipo>
     <contenuto>questa è la domanda per Cluedo. Giusto?</contenuto>
-</segnalazione>
-<segnalazione>
-    <username_segnalante>cliente1</username_segnalante
-        ><username_segnalato>mario123</username_segnalato>
-        <motivo>troppo offensivo</motivo>
-        <tipo>domanda</tipo>
-        <contenuto>Consigliereste di giocare ad un ragazzo di 13 anni?</contenuto>
-    </segnalazione>
+  </segnalazione>
+  <segnalazione>
+    <username_segnalante>cliente1</username_segnalante>
+    <username_segnalato>mario123</username_segnalato>
+    <motivo>troppo offensivo</motivo>
+    <tipo>domanda</tipo>
+    <contenuto>Consigliereste di giocare ad un ragazzo di 13 anni?</contenuto>
+  </segnalazione>
+  <segnalazione>
+    <username_segnalante>cliente4</username_segnalante>
+    <username_segnalato>peppe01</username_segnalato>
+    <motivo>PIPIPIPIPIPI</motivo>
+    <tipo>domanda</tipo>
+    <contenuto>Sono indeciso se comprarlo o no: vi è piaciuto? cosa vi ha soddisfatto e cosa non? voglio chiarirmi le idee per decidere se acquistarlo</contenuto>
+  </segnalazione>
+  <segnalazione>
+    <username_segnalante>cliente4</username_segnalante>
+    <username_segnalato>mario123</username_segnalato>
+    <motivo>A PAZZOOOOOO</motivo>
+    <tipo>domanda</tipo>
+    <contenuto>Consigliereste di giocare ad un ragazzo di 13 anni?</contenuto>
+  </segnalazione>
 </segnalazioni>
