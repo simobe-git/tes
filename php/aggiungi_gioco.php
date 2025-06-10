@@ -17,34 +17,88 @@ $xml = simplexml_load_file('../xml/giochi.xml');
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     if (isset($_POST['aggiungi_gioco'])) {
-        // creazione nuovo elemento gioco
-        $nuovo_gioco = $xml->addChild('gioco');
-        $nuovo_gioco->addChild('codice', $_POST['codice']);
-        $nuovo_gioco->addChild('titolo', $_POST['titolo']);
-        $nuovo_gioco->addChild('prezzo_originale', $_POST['prezzo_originale']);
-        $nuovo_gioco->addChild('prezzo_attuale', $_POST['prezzo_attuale']);
-        $nuovo_gioco->addChild('disponibile', $_POST['disponibile']);
-        $nuovo_gioco->addChild('categoria', $_POST['categoria']);
-        $nuovo_gioco->addChild('min_num_giocatori', $_POST['min_num_giocatori']);
-        $nuovo_gioco->addChild('max_num_giocatori', $_POST['max_num_giocatori']);
-        $nuovo_gioco->addChild('min_eta', $_POST['min_eta']);
-        $nuovo_gioco->addChild('avg_partita', $_POST['avg_partita']);
-        $nuovo_gioco->addChild('data_rilascio', $_POST['data_rilascio']);
-        $nuovo_gioco->addChild('nome_editore', $_POST['nome_editore']);
-        $nuovo_gioco->addChild('autore', $_POST['autore']);
-        $nuovo_gioco->addChild('descrizione', $_POST['descrizione']);
-        $nuovo_gioco->addChild('meccaniche', $_POST['meccaniche']);
-        $nuovo_gioco->addChild('ambientazione', $_POST['ambientazione']);
-        $nuovo_gioco->addChild('immagine', $_POST['immagine']);
 
-        // salvataggio file XML aggiornato
-        $dom = new DOMDocument('1.0');
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML($xml->asXML());
-        $dom->save('../xml/giochi.xml');
+        // verifica se è un duplicato controllando tutte le informazioni inserite con quelle già presenti
+        $dati_inseriti = [
+            'codice' => $_POST['codice'],
+            'titolo' => $_POST['titolo'],
+            'prezzo_originale' => $_POST['prezzo_originale'],
+            'prezzo_attuale' => $_POST['prezzo_attuale'],
+            'disponibile' => $_POST['disponibile'],
+            'categoria' => $_POST['categoria'],
+            'min_num_giocatori' => $_POST['min_num_giocatori'],
+            'max_num_giocatori' => $_POST['max_num_giocatori'],
+            'min_eta' => $_POST['min_eta'],
+            'avg_partita' => $_POST['avg_partita'],
+            'data_rilascio' => $_POST['data_rilascio'],
+            'nome_editore' => $_POST['nome_editore'],
+            'autore' => $_POST['autore'],
+            'descrizione' => $_POST['descrizione'],
+            'meccaniche' => $_POST['meccaniche'],
+            'ambientazione' => $_POST['ambientazione'],
+            'immagine' => $_POST['immagine']
+        ];
+        $duplicato = false;
 
-        $messaggio = "Nuovo gioco aggiunto con successo";
+        foreach ($xml->gioco as $gioco){    
+            $gioco_corrente = [
+                'codice' => $_POST['codice'],
+                'titolo' => $_POST['titolo'],
+                'prezzo_originale' => $_POST['prezzo_originale'],
+                'prezzo_attuale' => $_POST['prezzo_attuale'],
+                'disponibile' => $_POST['disponibile'],
+                'categoria' => $_POST['categoria'],
+                'min_num_giocatori' => $_POST['min_num_giocatori'],
+                'max_num_giocatori' => $_POST['max_num_giocatori'],
+                'min_eta' => $_POST['min_eta'],
+                'avg_partita' => $_POST['avg_partita'],
+                'data_rilascio' => $_POST['data_rilascio'],
+                'nome_editore' => $_POST['nome_editore'],
+                'autore' => $_POST['autore'],
+                'descrizione' => $_POST['descrizione'],
+                'meccaniche' => $_POST['meccaniche'],
+                'ambientazione' => $_POST['ambientazione'],
+                'immagine' => $_POST['immagine']
+            ];
+            if ($dati_inseriti == $gioco_corrente){
+                $duplicato = true;
+                break;
+            }
+        }
+
+        if($duplicato){
+            echo "<script>alert('Errore: esiste già un gioco con tutte queste informazioni.');</script>";
+        }else{
+            
+            // creazione nuovo elemento gioco
+            $nuovo_gioco = $xml->addChild('gioco');
+            $nuovo_gioco->addChild('codice', $_POST['codice']);
+            $nuovo_gioco->addChild('titolo', $_POST['titolo']);
+            $nuovo_gioco->addChild('prezzo_originale', $_POST['prezzo_originale']);
+            $nuovo_gioco->addChild('prezzo_attuale', $_POST['prezzo_attuale']);
+            $nuovo_gioco->addChild('disponibile', $_POST['disponibile']);
+            $nuovo_gioco->addChild('categoria', $_POST['categoria']);
+            $nuovo_gioco->addChild('min_num_giocatori', $_POST['min_num_giocatori']);
+            $nuovo_gioco->addChild('max_num_giocatori', $_POST['max_num_giocatori']);
+            $nuovo_gioco->addChild('min_eta', $_POST['min_eta']);
+            $nuovo_gioco->addChild('avg_partita', $_POST['avg_partita']);
+            $nuovo_gioco->addChild('data_rilascio', $_POST['data_rilascio']);
+            $nuovo_gioco->addChild('nome_editore', $_POST['nome_editore']);
+            $nuovo_gioco->addChild('autore', $_POST['autore']);
+            $nuovo_gioco->addChild('descrizione', $_POST['descrizione']);
+            $nuovo_gioco->addChild('meccaniche', $_POST['meccaniche']);
+            $nuovo_gioco->addChild('ambientazione', $_POST['ambientazione']);
+            $nuovo_gioco->addChild('immagine', $_POST['immagine']);
+
+            // salvataggio file XML aggiornato
+            $dom = new DOMDocument('1.0');
+            $dom->preserveWhiteSpace = false;
+            $dom->formatOutput = true;
+            $dom->loadXML($xml->asXML());
+            $dom->save('../xml/giochi.xml');
+
+            echo "<script>alert('Nuovo gioco aggiunto con successo');</script>";
+        }
     }
 }
 ?>
@@ -57,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Aggiungi Gioco</title>
     <style>
         .navbar {
-            background-color: #000; 
+            background-color: tomato; 
             color: #fff; 
             padding: 20px 0; 
             text-align: center; 
