@@ -99,13 +99,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['eleva_faq'])) {
     $rispostaContenuto = $_POST['risposta_contenuto'];
     $domandaContenuto = $_POST['domanda_contenuto'];
     
-    // aggiungimo nuova FAQ
-    $nuova_faq = $faq->addChild('faq');
-    $nuova_faq->addAttribute('id', time()); // Usare il timestamp come ID
-    $nuova_faq->addChild('domanda', htmlspecialchars($domandaContenuto));
-    $nuova_faq->addChild('risposta', htmlspecialchars($rispostaContenuto));
-    $nuova_faq->addChild('data_creazione', date('Y-m-d'));
-    $nuova_faq->addChild('fonte', 'forum');
+    // Controllo duplicati
+    $faqDuplicata = false;
+    foreach ($faq->faq as $faqItem){
+        if ((string)$faqItem->domanda === $domandaContenuto && (string)$faqItem->risposta === $rispostaContenuto){
+            $faqDuplicata = true;
+            break;
+        }
+    }
+
+    //Se la faq è un duplicato mostriammo un messaggio altrimenti la inseriamo 
+    if($faqDuplicata){
+        echo "<script>alert('Questa domanda e risposta sono già presenti tra le FAQ!');</script>";
+    }else{
+        // aggiungimo nuova FAQ
+        $nuova_faq = $faq->addChild('faq');
+        $nuova_faq->addAttribute('id', time()); // Usare il timestamp come ID
+        $nuova_faq->addChild('domanda', htmlspecialchars($domandaContenuto));
+        $nuova_faq->addChild('risposta', htmlspecialchars($rispostaContenuto));
+        $nuova_faq->addChild('data_creazione', date('Y-m-d'));
+        $nuova_faq->addChild('fonte', 'forum');
+    }
+
     
     // salvataggio delle FAQ aggiornate
     salvaFAQ($faq);
