@@ -22,4 +22,11 @@
     <tipo>domanda</tipo>
     <contenuto>Sono indeciso se comprarlo o no: vi è piaciuto? cosa vi ha soddisfatto e cosa non? voglio chiarirmi le idee per decidere se acquistarlo</contenuto>
   </segnalazione>
+  <segnalazione>
+    <username_segnalante>cliente1</username_segnalante>
+    <username_segnalato>luigi99</username_segnalato>
+    <motivo>ds</motivo>
+    <tipo>risposta</tipo>
+    <contenuto>Secondo me non vale i soldi spesi, vai su altro!</contenuto>
+  </segnalazione>
 </segnalazioni>

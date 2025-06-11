@@ -60,14 +60,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'ambientazione' => $_POST['ambientazione'],
                 'immagine' => $_POST['immagine']
             ];
-            if ($dati_inseriti == $gioco_corrente){
+            // verifichiamo se esistono già i parametri più importanti da controllare
+            // ad esempio non controlliamo il codice perchè se si inserisce un codice diverso di quello del gioco
+            // già presente ma tutto il resto è uguale non ha senso aggiungerlo
+            // quindi controlliamo i parametri che il gioco aggiunto deve avere obbligatoriamente distinti rispetto ai giochi già presenti
+            if ($dati_inseriti['titolo'] == $gioco_corrente['titolo'] &&
+                $dati_inseriti['prezzo_originale'] == $gioco_corrente['prezzo_originale'] &&
+                $dati_inseriti['prezzo_attuale'] == $gioco_corrente['prezzo_attuale'] &&
+                $dati_inseriti['categoria'] == $gioco_corrente['categoria'] &&
+                $dati_inseriti['min_num_giocatori'] == $gioco_corrente['min_num_giocatori'] &&
+                $dati_inseriti['max_num_giocatori'] == $gioco_corrente['max_num_giocatori'] &&
+                $dati_inseriti['min_eta'] == $gioco_corrente['min_eta'] &&
+                $dati_inseriti['avg_partita'] == $gioco_corrente['avg_partita'] &&
+                $dati_inseriti['data_rilascio'] == $gioco_corrente['data_rilascio'] &&
+                $dati_inseriti['nome_editore'] == $gioco_corrente['nome_editore'] &&
+                $dati_inseriti['autore'] == $gioco_corrente['autore']){
                 $duplicato = true;
                 break;
             }
         }
 
         if($duplicato){
-            echo "<script>alert('Errore: esiste già un gioco con tutte queste informazioni.');</script>";
+            echo "<script>alert('Errore: il gioco inserito esiste già.');</script>";
         }else{
             
             // creazione nuovo elemento gioco
